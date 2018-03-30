@@ -64,11 +64,14 @@ int main() {
 	etats.push_back(etat_depart);
 
 	printf("address de l'etat de depart %p\n", etat_depart);
-	std::list<Etat> nouveaux_etats_possibles = Outils::etats_possibles(&etat_depart, d);
+	std::list<Etat> nouveaux_etats_possibles = Outils::etats_possibles(etat_depart, d);
 
 	Etat e = nouveaux_etats_possibles.front();
 	cout << "etat de depart : \n" << etat_depart;
 	cout << "nouvel etat possible : \n" << e;
+
+	test_egal = e == etat_depart;
+	cout << "les deux etats egaux ? " << test_egal << endl;
 
 
 	//afficher_liste();

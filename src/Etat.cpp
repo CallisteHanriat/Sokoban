@@ -9,7 +9,8 @@
 
 void Etat::afficher(ostream& flux) const {
 	for (int i = 0; i < this->DERNIERE_POSITION; i++) {
-		printf("%d,%d : type %d\n", this->positions[i].cordX, this->positions[i].cordY, this->positions[i].valeurCase);
+		//printf("%d,%d : type %d\n", this->positions[i].cordX, this->positions[i].cordY, this->positions[i].valeurCase);
+		flux << +this->positions[i].cordX << ',' << +this->positions[i].cordY << " : type " << +this->positions[i].valeurCase << endl;
 	}
 }
 
@@ -22,22 +23,20 @@ ostream& operator<<(ostream& os, const Etat& state) {
  * Cette fonction vérifie l'égalité entre deux états
  */
 bool operator==(Etat const& a, Etat const& b) {
-	bool return_val = false;
+	bool return_val = true;
 	int j = 0;
 	for (int i = 0 ; i < a.DERNIERE_POSITION ; i++) {
 
 		Position p = a.positions[i];
 
-		while (a.positions[i].cordX != b.positions[j].cordX
-				&& a.positions[i].cordY != b.positions[j].cordY
-				&& a.positions[i].valeurCase != b.positions[j].valeurCase
+		while ((a.positions[i].cordX != b.positions[j].cordX
+				|| a.positions[i].cordY != b.positions[j].cordY
+				|| a.positions[i].valeurCase != b.positions[j].valeurCase)
 				&& j<b.DERNIERE_POSITION) {
 			j++;
 		}
-		if (j < b.DERNIERE_POSITION) {
-			return_val = true;
-		} else {
-			return_val = false;
+		if (j == b.DERNIERE_POSITION) {
+			return false;
 		}
 
 		j = 0;

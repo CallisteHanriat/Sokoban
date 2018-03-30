@@ -10,7 +10,7 @@
 /**
  * cette fonction génère un état grâce à un Sokoban donné.
  */
-Etat Outils::creer_Etat(Sokoban s) {
+Etat Outils::creer_Etat(Sokoban& s) {
 	Etat e;
 	for (int i = 0; i < s.HAUTMAX ; i++) {
 		for (int j = 0; j < s.LONGMAX ; j++) {
@@ -37,14 +37,14 @@ Etat Outils::creer_Etat(Sokoban s) {
  * cases 2 : le joueur
  * cases 4 : les cibles ou mettre les caisses
  */
-std::list<Etat> Outils::etats_possibles(Etat* e, Sokoban s) {
+std::list<Etat> Outils::etats_possibles(Etat& e, Sokoban& s) {
 	printf("address de e %p\n", e);
 
 	std::list<Etat> etats_temp;
 	Position position_joueur;
-	for (int i = 0; i<e->DERNIERE_POSITION; i++) {
-		if (e->positions[i].valeurCase == 2) {
-			position_joueur = e->positions[i];
+	for (int i = 0; i<e.DERNIERE_POSITION; i++) {
+		if (e.positions[i].valeurCase == 2) {
+			position_joueur = e.positions[i];
 		}
 	}
 
@@ -54,9 +54,9 @@ std::list<Etat> Outils::etats_possibles(Etat* e, Sokoban s) {
 
 	printf("valeur du dessus : %d\n", s.cadre[position_joueur.cordX][position_joueur.cordY-1] - '0');
 	if (s.cadre[position_joueur.cordX][position_joueur.cordY-1]-'0' == 4 || s.cadre[position_joueur.cordX][position_joueur.cordY-1]-'0' == 0) {
-		for (int i = 0; i<e->DERNIERE_POSITION; i++) {
-			nouvel_etat.positions[i] = e->positions[i];
-			if (e->positions[i].valeurCase == position_joueur.valeurCase) {
+		for (int i = 0; i<e.DERNIERE_POSITION; i++) {
+			nouvel_etat.positions[i] = e.positions[i];
+			if (e.positions[i].valeurCase == position_joueur.valeurCase) {
 				nouvel_etat.positions[i].cordY = position_joueur.cordY - 1;
 			}
 			nouvel_etat.DERNIERE_POSITION++;
