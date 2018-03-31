@@ -6,15 +6,15 @@
  */
 #include "Outils.hpp"
 
-
 /**
  * cette fonction génère un état grâce à un Sokoban donné.
  */
 Etat Outils::creer_Etat(Sokoban& s) {
 	Etat e;
-	for (int i = 0; i < s.HAUTMAX ; i++) {
-		for (int j = 0; j < s.LONGMAX ; j++) {
-			if (s.cadre[i][j] != 8+'0' && s.cadre[i][j] != 0+'0' && s.cadre[i][j] != 4+'0') {
+	for (int i = 0; i < s.HAUTMAX; i++) {
+		for (int j = 0; j < s.LONGMAX; j++) {
+			if (s.cadre[i][j] != 8 + '0' && s.cadre[i][j] != 0 + '0'
+					&& s.cadre[i][j] != 4 + '0') {
 				Position p;
 				p.cordX = j;
 				p.cordY = i;
@@ -42,27 +42,102 @@ std::list<Etat> Outils::etats_possibles(Etat& e, Sokoban& s) {
 
 	std::list<Etat> etats_temp;
 	Position position_joueur;
-	for (int i = 0; i<e.DERNIERE_POSITION; i++) {
+	for (int i = 0; i < e.DERNIERE_POSITION; i++) {
 		if (e.positions[i].valeurCase == 2) {
 			position_joueur = e.positions[i];
 		}
 	}
 
 	//si au dessus c'est une caisse vide
-	cout <<"Valeur visée : " << s.cadre[position_joueur.cordX][position_joueur.cordY-1] << endl;
+	cout << "Valeur visée : "
+			<< s.cadre[position_joueur.cordX][position_joueur.cordY - 1]
+			<< endl;
 	Etat nouvel_etat;
 
-	printf("valeur du dessus : %d\n", s.cadre[position_joueur.cordX][position_joueur.cordY-1] - '0');
-	if (s.cadre[position_joueur.cordX][position_joueur.cordY-1]-'0' == 4 || s.cadre[position_joueur.cordX][position_joueur.cordY-1]-'0' == 0) {
-		for (int i = 0; i<e.DERNIERE_POSITION; i++) {
+	printf("valeur du dessus : %d\n",
+			s.cadre[position_joueur.cordX][position_joueur.cordY - 1] - '0');
+	//si la case du dessus est une cible ou une case vide
+	if (s.cadre[position_joueur.cordX][position_joueur.cordY - 1] - '0' == 4
+			|| s.cadre[position_joueur.cordX][position_joueur.cordY - 1] - '0'
+					== 0) {
+		for (int i = 0; i < e.DERNIERE_POSITION; i++) {
 			nouvel_etat.positions[i] = e.positions[i];
 			if (e.positions[i].valeurCase == position_joueur.valeurCase) {
 				nouvel_etat.positions[i].cordY = position_joueur.cordY - 1;
 			}
 			nouvel_etat.DERNIERE_POSITION++;
 		}
+		etats_temp.push_back(nouvel_etat);
+		nouvel_etat.DERNIERE_POSITION = 0;
 	}
-	etats_temp.push_back(nouvel_etat);
+
+	//si la case à droite est une cible ou une case vide
+	if (s.cadre[position_joueur.cordX + 1][position_joueur.cordY] - '0' == 4
+			|| s.cadre[position_joueur.cordX + 1][position_joueur.cordY] - '0'
+					== 0) {
+		for (int i = 0; i < e.DERNIERE_POSITION; i++) {
+			nouvel_etat.positions[i] = e.positions[i];
+			if (e.positions[i].valeurCase == position_joueur.valeurCase) {
+				nouvel_etat.positions[i].cordX = position_joueur.cordX + 1;
+			}
+			nouvel_etat.DERNIERE_POSITION++;
+		}
+		etats_temp.push_back(nouvel_etat);
+		nouvel_etat.DERNIERE_POSITION = 0;
+	}
+
+
+
+	//si la case en bas est une cible ou une case vide
+	if (s.cadre[position_joueur.cordX][position_joueur.cordY + 1] - '0' == 4
+			|| s.cadre[position_joueur.cordX][position_joueur.cordY + 1] - '0'
+					== 0) {
+		for (int i = 0; i < e.DERNIERE_POSITION; i++) {
+			nouvel_etat.positions[i] = e.positions[i];
+			if (e.positions[i].valeurCase == position_joueur.valeurCase) {
+				nouvel_etat.positions[i].cordY = position_joueur.cordY + 1;
+			}
+			nouvel_etat.DERNIERE_POSITION++;
+		}
+		etats_temp.push_back(nouvel_etat);
+		nouvel_etat.DERNIERE_POSITION = 0;
+	}
+
+
+
+	//si la case à gauche est une cible ou une case vide
+	if (s.cadre[position_joueur.cordX - 1][position_joueur.cordY] - '0' == 4
+			|| s.cadre[position_joueur.cordX-1][position_joueur.cordY] - '0'
+					== 0) {
+		for (int i = 0; i < e.DERNIERE_POSITION; i++) {
+			nouvel_etat.positions[i] = e.positions[i];
+			if (e.positions[i].valeurCase == position_joueur.valeurCase) {
+				nouvel_etat.positions[i].cordX = position_joueur.cordX - 1;
+			}
+			nouvel_etat.DERNIERE_POSITION++;
+		}
+		etats_temp.push_back(nouvel_etat);
+	}
 	return etats_temp;
+}
+
+
+
+Etat Outils::generer_solution(Sokoban& s) {
+	Etat e;
+	for (int i = 0; i < s.HAUTMAX; i++) {
+		for (int j = 0; j < s.LONGMAX; j++) {
+			if (s.cadre[i][j] != 8 + '0' && s.cadre[i][j] != 0 + '0'
+					&& s.cadre[i][j] != 4 + '0') {
+				Position p;
+				p.cordX = j;
+				p.cordY = i;
+				p.valeurCase = s.cadre[i][j] - '0'; //pour convertir le char en int
+				e.positions[e.DERNIERE_POSITION] = p;
+				e.DERNIERE_POSITION++;
+			}
+		}
+	}
+
 }
 
