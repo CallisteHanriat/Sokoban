@@ -83,7 +83,10 @@ std::list<Etat> Outils::etats_possibles(Etat& e, Sokoban& s) {
 					nouvel_etat.positions[i].cordY = position_joueur.cordY - 1;
 				}
 				if (e.positions[i].cordX == position_joueur.cordX
-						&& e.positions[i].cordY == position_joueur.cordY - 1) {
+						&& e.positions[i].cordY == position_joueur.cordY - 1
+						&& s.cadre[e.positions[i].cordY-1][e.positions[i].cordX] - '0' != 8
+						&& s.cadre[e.positions[i].cordY-1][e.positions[i].cordX] - '0' != 5
+						&& s.cadre[e.positions[i].cordY-1][e.positions[i].cordX] - '0' != 1) {
 					nouvel_etat.positions[i].cordY =
 							nouvel_etat.positions[i].cordY - 1;
 					if (s.cadre[position_joueur.cordX][position_joueur.cordY - 2]
@@ -91,10 +94,9 @@ std::list<Etat> Outils::etats_possibles(Etat& e, Sokoban& s) {
 						nouvel_etat.positions[i].valeurCase = 5;
 				}
 			}
+			etats_temp.push_back(nouvel_etat);
+			nouvel_etat.DERNIERE_POSITION = 0;
 		}
-
-		etats_temp.push_back(nouvel_etat);
-		nouvel_etat.DERNIERE_POSITION = 0;
 	}
 
 	if (s.cadre[position_joueur.cordY][position_joueur.cordX + 1] - '0' != 8
@@ -125,18 +127,22 @@ std::list<Etat> Outils::etats_possibles(Etat& e, Sokoban& s) {
 				}
 				cout << "s.cadre[position_joueur.cordX + 2][position_joueur.cordY] : " << s.cadre[position_joueur.cordY][position_joueur.cordX+2] << endl;
 				if (e.positions[i].cordY == position_joueur.cordY
-						&& e.positions[i].cordX == position_joueur.cordX + 1) {
-					nouvel_etat.positions[i].cordX =
-							nouvel_etat.positions[i].cordX + 1;
+						&& e.positions[i].cordX == position_joueur.cordX + 1
+						&& s.cadre[e.positions[i].cordY][e.positions[i].cordX + 1] - '0'!= 8
+						&& s.cadre[e.positions[i].cordY][e.positions[i].cordX + 1] - '0'!= 5
+						&& s.cadre[e.positions[i].cordY][e.positions[i].cordX + 1] - '0'!= 1) {
+					if (e.positions[i].valeurCase == 1)
+						nouvel_etat.positions[i].cordX = nouvel_etat.positions[i].cordX + 1;
 					if (s.cadre[position_joueur.cordY][position_joueur.cordX+2]
 							- '0' == 4)
 						nouvel_etat.positions[i].valeurCase = 5;
 				}
 			}
+			etats_temp.push_back(nouvel_etat);
+			nouvel_etat.DERNIERE_POSITION = 0;
 		}
 
-		etats_temp.push_back(nouvel_etat);
-		nouvel_etat.DERNIERE_POSITION = 0;
+
 	}
 
 	if (s.cadre[position_joueur.cordY+1][position_joueur.cordX] - '0' != 8
@@ -162,18 +168,22 @@ std::list<Etat> Outils::etats_possibles(Etat& e, Sokoban& s) {
 					nouvel_etat.positions[i].cordY = position_joueur.cordY + 1;
 				}
 				if (e.positions[i].cordX == position_joueur.cordX
-						&& e.positions[i].cordY == position_joueur.cordY + 1) {
-					nouvel_etat.positions[i].cordY =
-							nouvel_etat.positions[i].cordY + 1;
+						&& e.positions[i].cordY == position_joueur.cordY + 1
+						&& s.cadre[e.positions[i].cordY+1][e.positions[i].cordX] - '0' != 8
+						&& s.cadre[e.positions[i].cordY+1][e.positions[i].cordX] - '0' != 5
+						&& s.cadre[e.positions[i].cordY+1][e.positions[i].cordX] - '0' != 1) {
+					if (e.positions[i].valeurCase == 1)
+						nouvel_etat.positions[i].cordY = nouvel_etat.positions[i].cordY + 1;
 					if (s.cadre[position_joueur.cordX][position_joueur.cordY + 2]
 							- '0' == 4)
 						nouvel_etat.positions[i].valeurCase = 5;
 				}
 			}
+			etats_temp.push_back(nouvel_etat);
+			nouvel_etat.DERNIERE_POSITION = 0;
 		}
 
-		etats_temp.push_back(nouvel_etat);
-		nouvel_etat.DERNIERE_POSITION = 0;
+
 	}
 
 	if (s.cadre[position_joueur.cordY][position_joueur.cordX-1] - '0' != 8
@@ -199,18 +209,22 @@ std::list<Etat> Outils::etats_possibles(Etat& e, Sokoban& s) {
 					nouvel_etat.positions[i].cordX = position_joueur.cordX - 1;
 				}
 				if (e.positions[i].cordY == position_joueur.cordY
-						&& e.positions[i].cordX == position_joueur.cordX - 1) {
-					nouvel_etat.positions[i].cordX =
-							nouvel_etat.positions[i].cordX - 1;
+						&& e.positions[i].cordX == position_joueur.cordX - 1
+						&& s.cadre[e.positions[i].cordY][e.positions[i].cordX-1] - '0' != 8
+						&& s.cadre[e.positions[i].cordY][e.positions[i].cordX-1] - '0' != 5
+						&& s.cadre[e.positions[i].cordY][e.positions[i].cordX-1] - '0' != 1) {
+					if (e.positions[i].valeurCase == 1)
+						nouvel_etat.positions[i].cordX = nouvel_etat.positions[i].cordX - 1;
 					if (s.cadre[position_joueur.cordX - 2][position_joueur.cordY]
 							- '0' == 4)
 						nouvel_etat.positions[i].valeurCase = 5;
 				}
 			}
+			etats_temp.push_back(nouvel_etat);
+			nouvel_etat.DERNIERE_POSITION = 0;
 		}
 
-		etats_temp.push_back(nouvel_etat);
-		nouvel_etat.DERNIERE_POSITION = 0;
+
 	}
 
 	return etats_temp;

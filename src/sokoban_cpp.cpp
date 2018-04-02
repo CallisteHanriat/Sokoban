@@ -15,18 +15,38 @@ using namespace std;
 std::list<Etat> etats;
 std::deque<Etat> etats_non_traites;
 
+void afficher_liste();
+
+bool est_dans_la_liste(Etat& e) {
+	std::list<Etat>::iterator state = etats.begin();
+
+
+	//cout << "affichage de la liste " << endl;
+	//afficher_liste();
+	while(state != etats.end()) {
+		//cout << "comparaison : \n" << e <<endl;
+		//cout << *state << endl;
+		if (e==*state || e.etat_sans_position_joueur() == *state) {
+			cout << "return true" << endl;
+			return true;
+		}
+		state++;
+	}
+	cout << "return false" << endl;
+	return false;
+}
+
 void remplir_queue(std::list<Etat>& l_etats) {
 	Etat e_courant;
 	std::list<Etat>::iterator iterator_deque;
 
 	for (std::list<Etat>::iterator it = l_etats.begin(); it != l_etats.end(); it++) {
 		e_courant = *it;
-		iterator_deque= find(etats.begin(), etats.end(), e_courant);
 
 		//Si l'element est deja dans la queue
-		if (iterator_deque == etats.end() || etats_non_traites.empty())
+		if (!est_dans_la_liste(e_courant)) {
 			etats_non_traites.push_back(*it);
-
+		}
 		//cout << "ajout de \n" << *it << endl;
 	}
 }
@@ -35,7 +55,7 @@ void afficher_liste(std::list<Etat>& l_etats) {
 	Etat e;
 	for (std::list<Etat>::iterator it = l_etats.begin(); it != l_etats.end(); it++) {
 		e = *it;
-		cout << e << endl;
+		cout <<"un etat : " << endl<<  e << endl;
 	}
 }
 
@@ -97,14 +117,14 @@ int main() {
 
 	int cpt = 0;
 	//tant qu'il reste des états à traiter
-	while (!etats_non_traites.empty() && etats.size() < 100) {
+	while (!etats_non_traites.empty()) {
 		//on dépile le noeud le plus haut puis
 		etat_courant = etats_non_traites.back();
 		etats_non_traites.pop_back();
 
 		cout << "----------Nouvelle iteration "<< cpt << "-------------" << endl;
 		cout << "taille etats_non_traites : " << etats_non_traites.size() << endl;
-		cout <<"etat coutant \n" << etat_courant<<endl;
+		cout << "etat coutant \n" << etat_courant << endl;
 		//on fabrique de nouveaux fils que nous mettons dans la queue
 		nouveaux_etats_possibles = Outils::etats_possibles(etat_courant, d);
 		//afficher_liste(nouveaux_etats_possibles);
@@ -112,7 +132,7 @@ int main() {
 
 		cout << "etat de la queue : " << endl;
 		for (int i = 0; i<etats_non_traites.size() ; i++) {
-			cout << etats_non_traites.at(i) << endl;
+//			cout << etats_non_traites.at(i) << endl;
 		}
 
 		etats.push_back(etat_courant);
@@ -123,6 +143,8 @@ int main() {
 
 	cout << "liste des etats : " << endl;
 	afficher_liste(etats);
+
+	cout << "nombre de noeuds : " << etats.size() << endl;
 
 /*	Etat e = nouveaux_etats_possibles.front();
 	cout << "etat de depart : \n" << etat_depart;

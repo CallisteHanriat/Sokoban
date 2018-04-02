@@ -14,8 +14,4 @@ Sokoban::Sokoban(int Longmax, int Hautmax, char** cadre) {
 	this->cadre = cadre;
 }
 
-Sokoban::~Sokoban() {
-	//printf("sokoban destroyed at %p\n", this);
-}
-
 
