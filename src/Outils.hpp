@@ -13,6 +13,7 @@ public:
 	static Etat creer_Etat(Sokoban& s);
 	static std::list<Etat> etats_possibles(Etat& e, Sokoban& s);
 	static Etat generer_solution(Sokoban& s);
+	static Sokoban creer_damier(FILE* f);
 };
 
 #endif /* OUTILS_HPP_ */

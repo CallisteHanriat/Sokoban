@@ -17,7 +17,7 @@ public:
 	char** cadre;
 	Sokoban(int Longmax, int Hautmax, char** cadre);
 	Sokoban() {};
-	~Sokoban();
+	~Sokoban(){};
 };
 
 #endif /* SOKOBAN_HPP_ */
