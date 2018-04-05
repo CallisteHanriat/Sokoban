@@ -6,6 +6,102 @@
  */
 #include "Outils.hpp"
 
+
+/**
+ *
+ */
+bool Outils::mouvement_possible_haut(Position& origine, Position& direction, Sokoban& s) {
+
+	if ((direction.cordX < 0 || direction.cordY < 0)
+			|| (direction.cordY > s.HAUTMAX || direction.cordX > s.LONGMAX)) {
+		return false;
+	}
+
+	char valeurCaseDirection = s.cadre[direction.cordY][direction.cordX]-'0';
+
+	if (valeurCaseDirection == 8) {
+		return false;
+	} else if (valeurCaseDirection == 5 && direction.cordY -1 < 0){
+		return false;
+	} else if((valeurCaseDirection == 5 || valeurCaseDirection == 1)
+			&& s.cadre[direction.cordY-1][direction.cordX]-'0' != 1
+			&& s.cadre[direction.cordY-1][direction.cordX]-'0' != 4
+			&& s.cadre[direction.cordY-1][direction.cordX]-'0' != 0
+			&& direction.cordY - 1 >= 0) {
+		return false;
+	} else if (valeurCaseDirection == 5) {
+		return false;
+	}
+	return true;
+}
+
+
+bool Outils::mouvement_possible_droit(Position& origine, Position& direction, Sokoban& s) {
+
+	if ((direction.cordX < 0 || direction.cordY < 0)
+			|| (direction.cordY > s.HAUTMAX || direction.cordX > s.LONGMAX)) {
+		return false;
+	}
+
+	char valeurCaseDirection = s.cadre[direction.cordY][direction.cordX]-'0';
+
+	if (valeurCaseDirection == 8) {
+		return false;
+	} else if((valeurCaseDirection == 5 || valeurCaseDirection == 1)
+			&& s.cadre[direction.cordY][direction.cordX+1]-'0' != 1
+			&& s.cadre[direction.cordY][direction.cordX+1]-'0' != 4
+			&& s.cadre[direction.cordY][direction.cordX+1]-'0' != 0
+			&& direction.cordX +1 >= s.LONGMAX) {
+		return false;
+	} else if (valeurCaseDirection == 5) {
+		return false;
+	}
+	return true;
+}
+
+bool Outils::mouvement_possible_bas(Position& origine, Position& direction, Sokoban& s) {
+	if ((direction.cordX < 0 || direction.cordY < 0)
+			|| (direction.cordY > s.HAUTMAX || direction.cordX > s.LONGMAX)) {
+		return false;
+	}
+
+	char valeurCaseDirection = s.cadre[direction.cordY][direction.cordX]-'0';
+
+	if (valeurCaseDirection == 8) {
+		return false;
+	} else if((valeurCaseDirection == 5 || valeurCaseDirection == 1)
+			&& s.cadre[direction.cordY+1][direction.cordX]-'0' != 1
+			&& s.cadre[direction.cordY+1][direction.cordX]-'0' != 4
+			&& s.cadre[direction.cordY+1][direction.cordX]-'0' != 0) {
+		return false;
+	} else if (valeurCaseDirection == 5) {
+		return false;
+	}
+	return true;
+}
+
+bool Outils::mouvement_possible_gauche(Position& origine, Position& direction, Sokoban& s) {
+	if ((direction.cordX < 0 || direction.cordY < 0)
+			|| (direction.cordY > s.HAUTMAX || direction.cordX > s.LONGMAX)) {
+		return false;
+	}
+
+	char valeurCaseDirection = s.cadre[direction.cordY][direction.cordX]-'0';
+
+	if (valeurCaseDirection == 8) {
+		return false;
+	} else if((valeurCaseDirection == 5 || valeurCaseDirection == 1)
+			&& s.cadre[direction.cordY][direction.cordX-1]-'0' != 1
+			&& s.cadre[direction.cordY][direction.cordX-1]-'0' != 4
+			&& s.cadre[direction.cordY][direction.cordX-1]-'0' != 0
+			&& direction.cordX -1 >= 0) {
+		return false;
+	} else if (valeurCaseDirection == 5) {
+		return false;
+	}
+	return true;
+}
+
 /**
  * cette fonction génère un état grâce à un Sokoban donné.
  */
@@ -13,8 +109,11 @@ Etat Outils::creer_Etat(Sokoban& s) {
 	Etat e;
 	for (int i = 0; i < s.HAUTMAX; i++) {
 		for (int j = 0; j < s.LONGMAX; j++) {
-			if (s.cadre[i][j] != 8 + '0' && s.cadre[i][j] != 0 + '0'
+			cout << "lettre à analyser : " << s.cadre[i][j] << endl;
+			if (s.cadre[i][j] != 8 + '0'
+					&& s.cadre[i][j] != 0 + '0'
 					&& s.cadre[i][j] != 4 + '0') {
+				cout << "entrée dans le if pour lettre " << s.cadre[i][j] <<  endl;
 				Position p;
 				p.cordX = j;
 				p.cordY = i;
@@ -37,7 +136,7 @@ Etat Outils::creer_Etat(Sokoban& s) {
  * cases 2 : le joueur
  * cases 4 : les cibles ou mettre les caisses
  */
-std::list<Etat> Outils::etats_possibles(Etat& e, Sokoban& s) {
+std::list<Etat> Outils::etats_possibles(Etat& e, Sokoban& s, Etat& eSol) {
 	std::list<Etat> etats_temp;
 	Position position_joueur;
 	for (int i = 0; i < e.DERNIERE_POSITION; i++) {
@@ -45,186 +144,146 @@ std::list<Etat> Outils::etats_possibles(Etat& e, Sokoban& s) {
 			position_joueur = e.positions[i];
 		}
 	}
-	/*	char cordX = position_joueur.cordX;
-	 position_joueur.cordX = position_joueur.cordY;
-	 position_joueur.cordY = cordX;*/
 
-	if (e.etat_sans_position_joueur() == Outils::generer_solution(s)) {
+	if (e.etat_sans_position_joueur() == eSol) {
 		cout << "On a un etat solution" << endl;
 		return etats_temp;
 	}
+
 	//si au dessus c'est une caisse vide
 	Etat nouvel_etat;
 
+	cout << "Sokoban interprete : " << endl;
+	s.affiche();
 	//si la case du dessus est une cible ou une case vide ou une case à déplacer
-	if (s.cadre[position_joueur.cordY - 1][position_joueur.cordX] - '0' != 8
-			&& s.cadre[position_joueur.cordY - 1][position_joueur.cordX] - '0'
-					!= 5) {
-
-		cout << "char concerne : "
-				<< s.cadre[position_joueur.cordY - 1][position_joueur.cordX]
-				<< endl;
-		//si au dessus c'est une case à déplacer et qu'il est possible de la déplacer
-		if (position_joueur.cordY >= 2
-				&& (s.cadre[position_joueur.cordY - 1][position_joueur.cordX]
-						- '0' == 1
-						|| s.cadre[position_joueur.cordY - 1][position_joueur.cordX]
-								- '0' == 0)
-				|| s.cadre[position_joueur.cordY - 1][position_joueur.cordX]
-						- '0' == 4
-						&& s.cadre[position_joueur.cordY - 2][position_joueur.cordX]
-								- '0' != 8
-						&& s.cadre[position_joueur.cordY - 2][position_joueur.cordX]
-								- '0' != 1) {
-			for (int i = 0; i < e.DERNIERE_POSITION; i++) {
-				nouvel_etat.positions[i] = e.positions[i];
-				nouvel_etat.DERNIERE_POSITION++;
-				if (e.positions[i].valeurCase == position_joueur.valeurCase) {
-					nouvel_etat.positions[i].cordY = position_joueur.cordY - 1;
-				}
-				if (e.positions[i].cordX == position_joueur.cordX
-						&& e.positions[i].cordY == position_joueur.cordY - 1
-						&& s.cadre[e.positions[i].cordY-1][e.positions[i].cordX] - '0' != 8
-						&& s.cadre[e.positions[i].cordY-1][e.positions[i].cordX] - '0' != 5
-						&& s.cadre[e.positions[i].cordY-1][e.positions[i].cordX] - '0' != 1) {
-					nouvel_etat.positions[i].cordY =
-							nouvel_etat.positions[i].cordY - 1;
-					if (s.cadre[position_joueur.cordX][position_joueur.cordY - 2]
-							- '0' == 4)
-						nouvel_etat.positions[i].valeurCase = 5;
-				}
+	Position cible;
+	cible.cordX = position_joueur.cordX;
+	cible.cordY = position_joueur.cordY - 1;
+	cible.valeurCase = position_joueur.valeurCase;
+	if (Outils::mouvement_possible_haut(position_joueur, cible, s)) {
+		for (int i = 0; i<e.DERNIERE_POSITION; i++) {
+			nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION] = e.positions[i];
+			if (nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase == position_joueur.valeurCase) {
+				nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY = nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY -1;
 			}
-			etats_temp.push_back(nouvel_etat);
-			nouvel_etat.DERNIERE_POSITION = 0;
+			if (nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX == position_joueur.cordX &&
+					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY == position_joueur.cordY - 1 &&
+					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase == 1 &&
+					position_joueur.cordY > 2) {
+				if (s.cadre[position_joueur.cordY - 2][position_joueur.cordX] -'0' == 4){
+					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase = 5;
+				}
+				nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY = nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY - 1;
+			}
+			nouvel_etat.DERNIERE_POSITION++;
 		}
+
+		etats_temp.push_back(nouvel_etat);
+		nouvel_etat.DERNIERE_POSITION = 0;
 	}
 
-	if (s.cadre[position_joueur.cordY][position_joueur.cordX + 1] - '0' != 8
-			&& s.cadre[position_joueur.cordY][position_joueur.cordX + 1] - '0'
-					!= 5) {
+	cible.cordY = position_joueur.cordY;
+	cible.cordX = position_joueur.cordX + 1;
+	if (Outils::mouvement_possible_droit(position_joueur, cible, s)) {
 
-		//si au dessus c'est une case à déplacer et qu'il est possible de la déplacer
-		cout << "char concerne : "
-				<< s.cadre[position_joueur.cordX][position_joueur.cordY]
-				<< endl;
-
-		if (position_joueur.cordX <= s.LONGMAX - 2
-				&& s.cadre[position_joueur.cordY][position_joueur.cordX + 1]
-						- '0' == 1
-				|| s.cadre[position_joueur.cordY][position_joueur.cordX + 1]
-						- '0' == 0
-				|| s.cadre[position_joueur.cordY][position_joueur.cordX + 1]
-						- '0' == 4
-						&& s.cadre[position_joueur.cordY][position_joueur.cordX
-								+ 2] - '0' != 8
-						&& s.cadre[position_joueur.cordY][position_joueur.cordX
-								+ 2] - '0' != 1) {
-			for (int i = 0; i < e.DERNIERE_POSITION; i++) {
-				nouvel_etat.positions[i] = e.positions[i];
-				nouvel_etat.DERNIERE_POSITION++;
-				if (e.positions[i].valeurCase == position_joueur.valeurCase) {
-					nouvel_etat.positions[i].cordX = position_joueur.cordX + 1;
-				}
-				cout << "s.cadre[position_joueur.cordX + 2][position_joueur.cordY] : " << s.cadre[position_joueur.cordY][position_joueur.cordX+2] << endl;
-				if (e.positions[i].cordY == position_joueur.cordY
-						&& e.positions[i].cordX == position_joueur.cordX + 1
-						&& s.cadre[e.positions[i].cordY][e.positions[i].cordX + 1] - '0'!= 8
-						&& s.cadre[e.positions[i].cordY][e.positions[i].cordX + 1] - '0'!= 5
-						&& s.cadre[e.positions[i].cordY][e.positions[i].cordX + 1] - '0'!= 1) {
-					if (e.positions[i].valeurCase == 1)
-						nouvel_etat.positions[i].cordX = nouvel_etat.positions[i].cordX + 1;
-					if (s.cadre[position_joueur.cordY][position_joueur.cordX+2]
-							- '0' == 4)
-						nouvel_etat.positions[i].valeurCase = 5;
-				}
+		for (int i = 0; i < e.DERNIERE_POSITION; i++) {
+			nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION] =
+					e.positions[i];
+			if (nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase
+					== position_joueur.valeurCase) {
+				nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX =
+						nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX + 1;
 			}
-			etats_temp.push_back(nouvel_etat);
-			nouvel_etat.DERNIERE_POSITION = 0;
+			if (nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX
+					== position_joueur.cordX + 1
+					&& nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY
+							== position_joueur.cordY
+					&& nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase
+							== 1 && position_joueur.cordX < s.LONGMAX-2) {
+				if (s.cadre[position_joueur.cordY][position_joueur.cordX+2]
+						- '0' == 4) {
+					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase =
+							5;
+				}
+				nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX =
+						nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX + 1;
+			}
+			nouvel_etat.DERNIERE_POSITION++;
 		}
 
-
+		etats_temp.push_back(nouvel_etat);
+		nouvel_etat.DERNIERE_POSITION = 0;
 	}
 
-	if (s.cadre[position_joueur.cordY+1][position_joueur.cordX] - '0' != 8
-			&& s.cadre[position_joueur.cordY+1][position_joueur.cordX] - '0'
-					!= 5) {
 
-		//si au dessus c'est une case à déplacer et qu'il est possible de la déplacer
-		if (position_joueur.cordY <= s.HAUTMAX - 2
-				&& s.cadre[position_joueur.cordY + 1][position_joueur.cordX]
-						- '0' == 1
-				|| s.cadre[position_joueur.cordY + 1][position_joueur.cordX]
-						- '0' == 0
-				|| s.cadre[position_joueur.cordY + 1][position_joueur.cordX]
-						- '0' == 4
-						&& s.cadre[position_joueur.cordY + 2][position_joueur.cordX]
-								- '0' != 8
-						&& s.cadre[position_joueur.cordY + 2][position_joueur.cordX]
-								- '0' != 1) {
-			for (int i = 0; i < e.DERNIERE_POSITION; i++) {
-				nouvel_etat.positions[i] = e.positions[i];
-				nouvel_etat.DERNIERE_POSITION++;
-				if (e.positions[i].valeurCase == position_joueur.valeurCase) {
-					nouvel_etat.positions[i].cordY = position_joueur.cordY + 1;
-				}
-				if (e.positions[i].cordX == position_joueur.cordX
-						&& e.positions[i].cordY == position_joueur.cordY + 1
-						&& s.cadre[e.positions[i].cordY+1][e.positions[i].cordX] - '0' != 8
-						&& s.cadre[e.positions[i].cordY+1][e.positions[i].cordX] - '0' != 5
-						&& s.cadre[e.positions[i].cordY+1][e.positions[i].cordX] - '0' != 1) {
-					if (e.positions[i].valeurCase == 1)
-						nouvel_etat.positions[i].cordY = nouvel_etat.positions[i].cordY + 1;
-					if (s.cadre[position_joueur.cordX][position_joueur.cordY + 2]
-							- '0' == 4)
-						nouvel_etat.positions[i].valeurCase = 5;
-				}
+	cible.cordY = position_joueur.cordY+1;
+	cible.cordX = position_joueur.cordX;
+	if (Outils::mouvement_possible_bas(position_joueur, cible, s)) {
+
+		for (int i = 0; i < e.DERNIERE_POSITION; i++) {
+			nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION] =
+					e.positions[i];
+			if (nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase
+					== position_joueur.valeurCase) {
+				nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY =
+						nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY
+								+ 1;
 			}
-			etats_temp.push_back(nouvel_etat);
-			nouvel_etat.DERNIERE_POSITION = 0;
+			if (nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX
+					== position_joueur.cordX
+					&& nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY
+							== position_joueur.cordY + 1
+					&& nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase
+							== 1 && position_joueur.cordY < s.HAUTMAX - 2) {
+				if (s.cadre[position_joueur.cordY + 2][position_joueur.cordX]
+						- '0' == 4) {
+					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase =
+							5;
+				}
+				nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY =
+						nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY
+								+ 1;
+			}
+			nouvel_etat.DERNIERE_POSITION++;
 		}
 
-
+		etats_temp.push_back(nouvel_etat);
+		nouvel_etat.DERNIERE_POSITION = 0;
 	}
 
-	if (s.cadre[position_joueur.cordY][position_joueur.cordX-1] - '0' != 8
-			&& s.cadre[position_joueur.cordY][position_joueur.cordX-1] - '0'
-					!= 5) {
+	cible.cordX = position_joueur.cordX-1;
+	cible.cordY = position_joueur.cordY;
+	if (Outils::mouvement_possible_gauche(position_joueur, cible, s)) {
 
-		//si au dessus c'est une case à déplacer et qu'il est possible de la déplacer
-		if (position_joueur.cordX <= 2
-				&& s.cadre[position_joueur.cordY][position_joueur.cordX - 1]
-						- '0' == 1
-				|| s.cadre[position_joueur.cordY][position_joueur.cordX - 1]
-						- '0' == 1
-				|| s.cadre[position_joueur.cordY][position_joueur.cordX - 1]
-						- '0' == 4
-						&& s.cadre[position_joueur.cordY][position_joueur.cordX
-								- 2] - '0' != 8
-						&& s.cadre[position_joueur.cordY][position_joueur.cordX
-								- 2] - '0' != 1) {
-			for (int i = 0; i < e.DERNIERE_POSITION; i++) {
-				nouvel_etat.positions[i] = e.positions[i];
-				nouvel_etat.DERNIERE_POSITION++;
-				if (e.positions[i].valeurCase == position_joueur.valeurCase) {
-					nouvel_etat.positions[i].cordX = position_joueur.cordX - 1;
-				}
-				if (e.positions[i].cordY == position_joueur.cordY
-						&& e.positions[i].cordX == position_joueur.cordX - 1
-						&& s.cadre[e.positions[i].cordY][e.positions[i].cordX-1] - '0' != 8
-						&& s.cadre[e.positions[i].cordY][e.positions[i].cordX-1] - '0' != 5
-						&& s.cadre[e.positions[i].cordY][e.positions[i].cordX-1] - '0' != 1) {
-					if (e.positions[i].valeurCase == 1)
-						nouvel_etat.positions[i].cordX = nouvel_etat.positions[i].cordX - 1;
-					if (s.cadre[position_joueur.cordX - 2][position_joueur.cordY]
-							- '0' == 4)
-						nouvel_etat.positions[i].valeurCase = 5;
-				}
+		for (int i = 0; i < e.DERNIERE_POSITION; i++) {
+			nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION] =
+					e.positions[i];
+			if (nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase
+					== position_joueur.valeurCase) {
+				nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX =
+						nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX
+								- 1;
 			}
-			etats_temp.push_back(nouvel_etat);
-			nouvel_etat.DERNIERE_POSITION = 0;
+			if (nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX
+					== position_joueur.cordX -1
+					&& nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY
+							== position_joueur.cordY
+					&& nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase
+							== 1 && position_joueur.cordX > 2) {
+				if (s.cadre[position_joueur.cordY][position_joueur.cordX-2]
+						- '0' == 4) {
+					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase =
+							5;
+				}
+				nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX =
+						nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX
+								- 1;
+			}
+			nouvel_etat.DERNIERE_POSITION++;
 		}
 
-
+		etats_temp.push_back(nouvel_etat);
+		nouvel_etat.DERNIERE_POSITION = 0;
 	}
 
 	return etats_temp;
@@ -232,13 +291,13 @@ std::list<Etat> Outils::etats_possibles(Etat& e, Sokoban& s) {
 
 Sokoban Outils::creer_damier(FILE* f) {
 	Sokoban d;
-	fscanf(f, "%d,%d", &(d.LONGMAX), &(d.HAUTMAX));
+	fscanf(f, "%d,%d", &(d.HAUTMAX), &(d.LONGMAX));
 	int val;
-	d.cadre = (char**) malloc(sizeof(char*) * d.LONGMAX);
+	d.cadre = (char**) malloc(sizeof(char*) * d.HAUTMAX);
 
-	for (int i = 0; i < d.LONGMAX; i++) {
-		d.cadre[i] = (char*) malloc(sizeof(char) * d.HAUTMAX);
-		for (int j = 0; j < d.HAUTMAX; j++) {
+	for (int i = 0; i < d.HAUTMAX; i++) {
+		d.cadre[i] = (char*) malloc(sizeof(char) * d.LONGMAX);
+		for (int j = 0; j < d.LONGMAX; j++) {
 			if (fscanf(f, "%d,", &val) == 1) {
 				d.cadre[i][j] = val + '0';
 			}
@@ -253,10 +312,12 @@ Sokoban Outils::creer_damier(FILE* f) {
  */
 Etat Outils::generer_solution(Sokoban& s) {
 	Etat e;
+	char valCase;
 	for (int i = 0; i < s.HAUTMAX; i++) {
 		for (int j = 0; j < s.LONGMAX; j++) {
 			//si on trouve la case 4
-			if (s.cadre[i][j] == 4 + '0') {
+			valCase = s.cadre[i][j]-'0';
+			if (valCase == 4) {
 				Position p;
 				p.cordX = j;
 				p.cordY = i;

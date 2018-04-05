@@ -22,7 +22,7 @@ public:
 
 class Etat {
 public:
-	Position positions[8];
+	Position positions[12];
 	char DERNIERE_POSITION = 0;
 	void afficher(ostream& flux) const;
 	Etat etat_sans_position_joueur();

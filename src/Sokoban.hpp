@@ -15,7 +15,11 @@ public:
 	int LONGMAX;
 	int HAUTMAX;
 	char** cadre;
+	Etat etat_initial;
 	Sokoban(int Longmax, int Hautmax, char** cadre);
+	Sokoban& appliquer_etat(Etat& e);
+	Etat creer_etat();
+	void affiche();
 	Sokoban() {};
 	~Sokoban(){};
 };

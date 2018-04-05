@@ -9,7 +9,6 @@
 
 void Etat::afficher(ostream& flux) const {
 	for (int i = 0; i < this->DERNIERE_POSITION; i++) {
-		//printf("%d,%d : type %d\n", this->positions[i].cordX, this->positions[i].cordY, this->positions[i].valeurCase);
 		flux << +this->positions[i].cordY << ',' << +this->positions[i].cordX << " : type " << +this->positions[i].valeurCase << endl;
 	}
 }

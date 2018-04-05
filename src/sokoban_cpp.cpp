@@ -17,6 +17,7 @@ std::deque<Etat> etats_non_traites;
 
 void afficher_liste();
 
+
 bool est_dans_la_liste(Etat& e) {
 	std::list<Etat>::iterator state = etats.begin();
 
@@ -65,19 +66,11 @@ void afficher_liste() {
 	}
 }
 
-void affiche(Sokoban& d) {
-	for (int i = 0; i < d.HAUTMAX; i++) {
-		printf("%s\n", d.cadre[i]);
-	}
-	cout << "2 eme colonne 3 eme ligne : " << d.cadre[3][2] << endl;
-	cout << "char du joueur  : " << d.cadre[5][1] << endl;
-}
-
 
 
 int main() {
 	FILE *f;
-	f = fopen("res/soko52.txt", "r");
+	f = fopen("res/soko10.txt", "r");
 
 	if (f == NULL) {
 		printf("File not created okay, errno = %d\n", errno);
@@ -85,15 +78,17 @@ int main() {
 	}
 
 	Sokoban d = Outils::creer_damier(f); // d est à la même adresse que le d retourné par creer_damier
-	affiche(d);
+	d.affiche();
 
 	cout << "char concerne ici : " << d.cadre[5][1] << endl;
 	Etat etat_depart = Outils::creer_Etat(d);
+	d.etat_initial = etat_depart;
 	//on met le premier état dans la liste d'états.
 	cout <<"etat de depart \n"<< etat_depart << endl;
-	std::list<Etat> nouveaux_etats_possibles = Outils::etats_possibles(etat_depart, d);
 	Etat eSol = Outils::generer_solution(d);
+	std::list<Etat> nouveaux_etats_possibles = Outils::etats_possibles(etat_depart, d.appliquer_etat(etat_depart), eSol);
 	Etat etat_courant;
+
 
 /*	cout << eSol;
 	Etat etat_main;
@@ -117,7 +112,7 @@ int main() {
 
 	int cpt = 0;
 	//tant qu'il reste des états à traiter
-	while (!etats_non_traites.empty()) {
+	while (!etats_non_traites.empty() && !(etat_courant.etat_sans_position_joueur() == eSol) && cpt < 100) {
 		//on dépile le noeud le plus haut puis
 		etat_courant = etats_non_traites.back();
 		etats_non_traites.pop_back();
@@ -126,13 +121,17 @@ int main() {
 		cout << "taille etats_non_traites : " << etats_non_traites.size() << endl;
 		cout << "etat coutant \n" << etat_courant << endl;
 		//on fabrique de nouveaux fils que nous mettons dans la queue
-		nouveaux_etats_possibles = Outils::etats_possibles(etat_courant, d);
+		if (cpt == 5) {
+			cout << "debug" << endl;
+		}
+		nouveaux_etats_possibles = Outils::etats_possibles(etat_courant, d.appliquer_etat(etat_courant), eSol);
 		//afficher_liste(nouveaux_etats_possibles);
 		remplir_queue(nouveaux_etats_possibles);
 
 		cout << "etat de la queue : " << endl;
+
 		for (int i = 0; i<etats_non_traites.size() ; i++) {
-//			cout << etats_non_traites.at(i) << endl;
+			//cout << etats_non_traites.at(i) << endl;
 		}
 
 		etats.push_back(etat_courant);
