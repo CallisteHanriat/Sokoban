@@ -31,6 +31,9 @@ bool Outils::mouvement_possible_haut(Position& origine, Position& direction, Sok
 		return false;
 	} else if (valeurCaseDirection == 5) {
 		return false;
+	}else if (valeurCaseDirection == 1
+			&& s.cadre[direction.cordY-1][direction.cordX]-'0' == 1) {
+		return false;
 	}
 	return true;
 }
@@ -55,6 +58,9 @@ bool Outils::mouvement_possible_droit(Position& origine, Position& direction, So
 		return false;
 	} else if (valeurCaseDirection == 5) {
 		return false;
+	} else if (valeurCaseDirection == 1
+			&& s.cadre[direction.cordY][direction.cordX+1]-'0' == 1) {
+		return false;
 	}
 	return true;
 }
@@ -75,6 +81,9 @@ bool Outils::mouvement_possible_bas(Position& origine, Position& direction, Soko
 			&& s.cadre[direction.cordY+1][direction.cordX]-'0' != 0) {
 		return false;
 	} else if (valeurCaseDirection == 5) {
+		return false;
+	}else if (valeurCaseDirection == 1
+			&& s.cadre[direction.cordY+1][direction.cordX]-'0' == 1) {
 		return false;
 	}
 	return true;
@@ -98,6 +107,9 @@ bool Outils::mouvement_possible_gauche(Position& origine, Position& direction, S
 		return false;
 	} else if (valeurCaseDirection == 5) {
 		return false;
+	}else if (valeurCaseDirection == 1
+			&& s.cadre[direction.cordY][direction.cordX-1]-'0' == 1) {
+		return false;
 	}
 	return true;
 }
@@ -113,7 +125,6 @@ Etat Outils::creer_Etat(Sokoban& s) {
 			if (s.cadre[i][j] != 8 + '0'
 					&& s.cadre[i][j] != 0 + '0'
 					&& s.cadre[i][j] != 4 + '0') {
-				cout << "entrée dans le if pour lettre " << s.cadre[i][j] <<  endl;
 				Position p;
 				p.cordX = j;
 				p.cordY = i;
@@ -124,6 +135,7 @@ Etat Outils::creer_Etat(Sokoban& s) {
 		}
 	}
 	//printf("e address %p\n", e);
+	e.DERNIERE_POSITION--;
 	return e;
 }
 

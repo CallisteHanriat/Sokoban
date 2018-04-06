@@ -14,10 +14,13 @@ class Sokoban {
 public:
 	int LONGMAX;
 	int HAUTMAX;
-	char** cadre;
+	//char** cadre;
+
+	vector<vector<char>> cadre;
 	Etat etat_initial;
 	Sokoban(int Longmax, int Hautmax, char** cadre);
-	Sokoban& appliquer_etat(Etat& e);
+	void appliquer_etat(Etat& e, Sokoban& s_init);
+	void test(Sokoban& s);
 	Etat creer_etat();
 	void affiche();
 	Sokoban() {};

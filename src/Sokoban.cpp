@@ -6,7 +6,7 @@
  */
 
 #include "Sokoban.hpp"
-
+#include "string.h"
 void Sokoban::affiche() {
 	for (int i = 0; i < this->HAUTMAX; i++) {
 			printf("%s\n", this->cadre[i]);
@@ -19,32 +19,38 @@ Sokoban::Sokoban(int Longmax, int Hautmax, char** cadre) {
 	this->cadre = cadre;
 }
 
-Sokoban& Sokoban::appliquer_etat(Etat& e) {
+void Sokoban::test(Sokoban& s) {
+	this->cadre[0][0] = '7';
+}
+
+void Sokoban::appliquer_etat(Etat& e,  Sokoban& s_init) {
 	this->affiche();
+	Sokoban s_temp;
 	int i = 0;
 	int j = 0;
-	while (i < this->HAUTMAX
-			&& j < this->LONGMAX
-			&& this->cadre[i][j] - '0' != 2) {
-		j++;
-		if (j == this->LONGMAX) {
-			j = 0;
-			i++;
-		}
+	this->cadre = (char**)malloc (sizeof(char*)*this->HAUTMAX);
+	for (int i = 0; i< this->HAUTMAX ; i++) {
+		this->cadre[i] = (char*) malloc(sizeof(char)*(this->LONGMAX+1));
+		strcpy(this->cadre[i], s_init.cadre[i]);
 	}
-	this->cadre[i][j] = '0';
-	/*for (int i = 0; i < this->etat_initial.DERNIERE_POSITION; i++) {
-		if (this->cadre[this->etat_initial.positions[i].cordY][this->etat_initial.positions[i].cordX] - '0'
-				== 2) {
-			this->cadre[this->etat_initial.positions[i].cordY][this->etat_initial.positions[i].cordX] =
-					'0';
-		}
-	}*/
+	cout << "etat du s_init : " << endl;
+	cout << s_init.etat_initial << endl;
+	while (i < s_init.etat_initial.DERNIERE_POSITION &&
+			s_init.etat_initial.positions[i].valeurCase != '2') {
+		i++;
+	}
+
+	Position p = s_init.etat_initial.positions[i];
+	this->cadre[p.cordY][p.cordX] = '0';
+
+
+	cout << "addr cadre this : " << &this->cadre << endl;
+	cout << "addr cadre s_init : " << &(s_init.cadre) << endl;
+
+	cout << "deuxieme affichage" << endl;
 	for (int i = 0; i<e.DERNIERE_POSITION ; i++) {
 		this->cadre[e.positions[i].cordY][e.positions[i].cordX] = e.positions[i].valeurCase + '0';
 	}
-
-	return *this;
 }
 
 Etat Sokoban::creer_etat() {

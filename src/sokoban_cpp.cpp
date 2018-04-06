@@ -27,7 +27,8 @@ bool est_dans_la_liste(Etat& e) {
 	while(state != etats.end()) {
 		//cout << "comparaison : \n" << e <<endl;
 		//cout << *state << endl;
-		if (e==*state || e.etat_sans_position_joueur() == *state) {
+		if (e==*state || e.etat_sans_position_joueur() == *state
+				|| e==(*state).etat_sans_position_joueur()) {
 			cout << "return true" << endl;
 			return true;
 		}
@@ -70,23 +71,32 @@ void afficher_liste() {
 
 int main() {
 	FILE *f;
-	f = fopen("res/soko10.txt", "r");
+	f = fopen("res/soko1.txt", "r");
 
 	if (f == NULL) {
 		printf("File not created okay, errno = %d\n", errno);
 		return 1;
 	}
 
-	Sokoban d = Outils::creer_damier(f); // d est à la même adresse que le d retourné par creer_damier
-	d.affiche();
+	Sokoban sokoban_intial = Outils::creer_damier(f);
+	Sokoban sokoban_courant = sokoban_intial;
+	sokoban_intial.etat_initial = Outils::creer_Etat(sokoban_intial);
+	sokoban_courant.affiche();
 
-	cout << "char concerne ici : " << d.cadre[5][1] << endl;
-	Etat etat_depart = Outils::creer_Etat(d);
-	d.etat_initial = etat_depart;
+	sokoban_courant.test(sokoban_intial);
+	cout << "s_init : " << endl;
+	sokoban_intial.affiche();
+	cout << "char concerne ici : " << sokoban_courant.cadre[5][1] << endl;
+	Etat etat_depart = Outils::creer_Etat(sokoban_intial);
+
 	//on met le premier état dans la liste d'états.
 	cout <<"etat de depart \n"<< etat_depart << endl;
-	Etat eSol = Outils::generer_solution(d);
-	std::list<Etat> nouveaux_etats_possibles = Outils::etats_possibles(etat_depart, d.appliquer_etat(etat_depart), eSol);
+	Etat eSol = Outils::generer_solution(sokoban_intial);
+	sokoban_courant.appliquer_etat(etat_depart, sokoban_intial);
+	std::list<Etat> nouveaux_etats_possibles = Outils::etats_possibles(etat_depart, sokoban_courant , eSol);
+
+	cout << "sokoban init : " << endl;
+	sokoban_intial.affiche();
 	Etat etat_courant;
 
 
@@ -112,7 +122,7 @@ int main() {
 
 	int cpt = 0;
 	//tant qu'il reste des états à traiter
-	while (!etats_non_traites.empty() && !(etat_courant.etat_sans_position_joueur() == eSol) && cpt < 100) {
+	while (!etats_non_traites.empty() && !(etat_courant.etat_sans_position_joueur() == eSol)) {
 		//on dépile le noeud le plus haut puis
 		etat_courant = etats_non_traites.back();
 		etats_non_traites.pop_back();
@@ -121,11 +131,14 @@ int main() {
 		cout << "taille etats_non_traites : " << etats_non_traites.size() << endl;
 		cout << "etat coutant \n" << etat_courant << endl;
 		//on fabrique de nouveaux fils que nous mettons dans la queue
-		if (cpt == 5) {
+		if (cpt == 69) {
 			cout << "debug" << endl;
 		}
-		nouveaux_etats_possibles = Outils::etats_possibles(etat_courant, d.appliquer_etat(etat_courant), eSol);
+		sokoban_courant.appliquer_etat(etat_courant, sokoban_intial);
+		nouveaux_etats_possibles = Outils::etats_possibles(etat_courant, sokoban_courant, eSol);
 		//afficher_liste(nouveaux_etats_possibles);
+		cout << "sokoban initial " << endl;
+		sokoban_intial.affiche();
 		remplir_queue(nouveaux_etats_possibles);
 
 		cout << "etat de la queue : " << endl;
@@ -141,7 +154,7 @@ int main() {
 	}
 
 	cout << "liste des etats : " << endl;
-	afficher_liste(etats);
+//	afficher_liste(etats);
 
 	cout << "nombre de noeuds : " << etats.size() << endl;
 
