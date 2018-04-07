@@ -24,33 +24,87 @@ void Sokoban::test(Sokoban& s) {
 }
 
 void Sokoban::appliquer_etat(Etat& e,  Sokoban& s_init) {
-	this->affiche();
-	Sokoban s_temp;
-	int i = 0;
-	int j = 0;
-	this->cadre = (char**)malloc (sizeof(char*)*this->HAUTMAX);
+	Sokoban s_tmp;
+	//this->affiche();
+	s_tmp.HAUTMAX = this->HAUTMAX;
+	s_tmp.LONGMAX = this->LONGMAX;
+	s_tmp.cadre = (char**)malloc (sizeof(char*)*this->HAUTMAX);
 	for (int i = 0; i< this->HAUTMAX ; i++) {
-		this->cadre[i] = (char*) malloc(sizeof(char)*(this->LONGMAX+1));
-		strcpy(this->cadre[i], s_init.cadre[i]);
+		s_tmp.cadre[i] = (char*) malloc(sizeof(char)*(this->LONGMAX+1));
+		for (int j = 0 ; j < this->LONGMAX ; j++) {
+			char val = this->cadre[i][j];
+			if (val != '2')
+				s_tmp.cadre[i][j] = val;
+			else
+				s_tmp.cadre[i][j] = '0';
+		}
 	}
-	cout << "etat du s_init : " << endl;
-	cout << s_init.etat_initial << endl;
-	while (i < s_init.etat_initial.DERNIERE_POSITION &&
-			s_init.etat_initial.positions[i].valeurCase != '2') {
-		i++;
+	//On récupère les coordonnées du joueur de l'état courant :
+/*	cout << "premier affichage" << endl;
+	s_tmp.affiche();*/
+	int hautJoueurCourant=0;
+	int lonJoueurCourant=0;
+	bool trouve = false;
+	while (hautJoueurCourant < this->HAUTMAX && !trouve) {
+		while (lonJoueurCourant < this->LONGMAX && this->cadre[hautJoueurCourant][lonJoueurCourant] - '0'!= 2) {
+			lonJoueurCourant++;
+		}
+		if(lonJoueurCourant < this->LONGMAX)
+			trouve = true;
+
+		if (!trouve){
+			lonJoueurCourant = 0;
+			hautJoueurCourant++;
+		}
+	}
+	char vaCaseInitPosiJActu = s_init.cadre[hautJoueurCourant][lonJoueurCourant] - '0';
+	Position posCaseInitJoueurCourant(lonJoueurCourant, hautJoueurCourant, vaCaseInitPosiJActu);
+
+	if (posCaseInitJoueurCourant.valeurCase == 2) {
+		s_tmp.cadre[posCaseInitJoueurCourant.cordY][posCaseInitJoueurCourant.cordX] = '0';
+	} else if (posCaseInitJoueurCourant.valeurCase == 4) {
+		s_tmp.cadre[posCaseInitJoueurCourant.cordY][posCaseInitJoueurCourant.cordX] = '4';
 	}
 
-	Position p = s_init.etat_initial.positions[i];
-	this->cadre[p.cordY][p.cordX] = '0';
-
-
-	cout << "addr cadre this : " << &this->cadre << endl;
-	cout << "addr cadre s_init : " << &(s_init.cadre) << endl;
-
-	cout << "deuxieme affichage" << endl;
+/*	cout << "deuxieme affichage : " << endl;
+	s_tmp.affiche();*/
 	for (int i = 0; i<e.DERNIERE_POSITION ; i++) {
-		this->cadre[e.positions[i].cordY][e.positions[i].cordX] = e.positions[i].valeurCase + '0';
+		s_tmp.cadre[e.positions[i].cordY][e.positions[i].cordX] = e.positions[i].valeurCase + '0';
 	}
+
+	bool bon1Trouve = false;
+	bool bon5Trouve = false;
+	char vCase;
+	int p;
+	//tous les endroits où il y a un 1 dans le tmp, si c'est pas un 1 de l'état alors on lui met 0
+	for (int i = 0; i<s_tmp.HAUTMAX; i++) {
+		for (int j = 0 ; j<s_tmp.LONGMAX; j++) {
+			vCase = s_tmp.cadre[i][j];
+			p = 0;
+			bon1Trouve = false;
+			if (vCase == '1') {
+				while (p<e.DERNIERE_POSITION && !bon1Trouve) {
+					if (e.positions[p].cordX == j && e.positions[p].cordY == i)
+						bon1Trouve = true;
+					p++;
+				}
+				if (!bon1Trouve)
+					s_tmp.cadre[i][j] = '0';
+			}else if (vCase == '5') {
+				p = 0;
+				while (p<e.DERNIERE_POSITION && !bon5Trouve) {
+					if(e.positions[p].cordX == j && e.positions[p].cordY == i)
+						bon5Trouve = true;
+					p++;
+				}
+				if (!bon5Trouve)
+					s_tmp.cadre[i][j] = '4';
+			}
+		}
+	}
+/*	cout << "troisieme affichage" << endl;
+	s_tmp.affiche();*/
+	this->cadre = s_tmp.cadre;
 }
 
 Etat Sokoban::creer_etat() {

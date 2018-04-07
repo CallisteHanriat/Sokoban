@@ -34,7 +34,7 @@ bool est_dans_la_liste(Etat& e) {
 		}
 		state++;
 	}
-	cout << "return false" << endl;
+	cout << e << endl << "Pas dans la liste" << endl;
 	return false;
 }
 
@@ -71,7 +71,7 @@ void afficher_liste() {
 
 int main() {
 	FILE *f;
-	f = fopen("res/soko1.txt", "r");
+	f = fopen("res/soko11.txt", "r");
 
 	if (f == NULL) {
 		printf("File not created okay, errno = %d\n", errno);
@@ -83,10 +83,6 @@ int main() {
 	sokoban_intial.etat_initial = Outils::creer_Etat(sokoban_intial);
 	sokoban_courant.affiche();
 
-	sokoban_courant.test(sokoban_intial);
-	cout << "s_init : " << endl;
-	sokoban_intial.affiche();
-	cout << "char concerne ici : " << sokoban_courant.cadre[5][1] << endl;
 	Etat etat_depart = Outils::creer_Etat(sokoban_intial);
 
 	//on met le premier état dans la liste d'états.
@@ -131,21 +127,14 @@ int main() {
 		cout << "taille etats_non_traites : " << etats_non_traites.size() << endl;
 		cout << "etat coutant \n" << etat_courant << endl;
 		//on fabrique de nouveaux fils que nous mettons dans la queue
-		if (cpt == 69) {
+		if (cpt == 3707) {
 			cout << "debug" << endl;
 		}
 		sokoban_courant.appliquer_etat(etat_courant, sokoban_intial);
 		nouveaux_etats_possibles = Outils::etats_possibles(etat_courant, sokoban_courant, eSol);
 		//afficher_liste(nouveaux_etats_possibles);
-		cout << "sokoban initial " << endl;
-		sokoban_intial.affiche();
 		remplir_queue(nouveaux_etats_possibles);
 
-		cout << "etat de la queue : " << endl;
-
-		for (int i = 0; i<etats_non_traites.size() ; i++) {
-			//cout << etats_non_traites.at(i) << endl;
-		}
 
 		etats.push_back(etat_courant);
 		cout << "sizeof queue node restant : " << etats_non_traites.size()<< endl;

@@ -50,11 +50,12 @@ bool Outils::mouvement_possible_droit(Position& origine, Position& direction, So
 
 	if (valeurCaseDirection == 8) {
 		return false;
-	} else if((valeurCaseDirection == 5 || valeurCaseDirection == 1)
+	} else if (direction.cordX + 1 >= s.LONGMAX) {
+		return false;
+	}else if((valeurCaseDirection == 5 || valeurCaseDirection == 1)
 			&& s.cadre[direction.cordY][direction.cordX+1]-'0' != 1
 			&& s.cadre[direction.cordY][direction.cordX+1]-'0' != 4
-			&& s.cadre[direction.cordY][direction.cordX+1]-'0' != 0
-			&& direction.cordX +1 >= s.LONGMAX) {
+			&& s.cadre[direction.cordY][direction.cordX+1]-'0' != 0) {
 		return false;
 	} else if (valeurCaseDirection == 5) {
 		return false;
@@ -135,7 +136,7 @@ Etat Outils::creer_Etat(Sokoban& s) {
 		}
 	}
 	//printf("e address %p\n", e);
-	e.DERNIERE_POSITION--;
+	//e.DERNIERE_POSITION;
 	return e;
 }
 
@@ -308,7 +309,7 @@ Sokoban Outils::creer_damier(FILE* f) {
 	d.cadre = (char**) malloc(sizeof(char*) * d.HAUTMAX);
 
 	for (int i = 0; i < d.HAUTMAX; i++) {
-		d.cadre[i] = (char*) malloc(sizeof(char) * d.LONGMAX);
+		d.cadre[i] = (char*) malloc(sizeof(char) * d.LONGMAX+1);
 		for (int j = 0; j < d.LONGMAX; j++) {
 			if (fscanf(f, "%d,", &val) == 1) {
 				d.cadre[i][j] = val + '0';

@@ -8,9 +8,13 @@
 #include "Etat.hpp"
 
 void Etat::afficher(ostream& flux) const {
+	int cp=0;
 	for (int i = 0; i < this->DERNIERE_POSITION; i++) {
+		if (this->positions[i].valeurCase == 5)
+			cp++;
 		flux << +this->positions[i].cordY << ',' << +this->positions[i].cordX << " : type " << +this->positions[i].valeurCase << endl;
 	}
+	flux << "Nombre de 5 : " << cp << endl;
 }
 
 ostream& operator<<(ostream& os, const Etat& state) {

@@ -16,6 +16,11 @@ using namespace std;
 class Position{
 public:
 	unsigned char cordX, cordY, valeurCase;
+	Position(char x, char y, char val) {
+		this->cordX = x;
+		this->cordY = y;
+		this->valeurCase = val;
+	}
 	Position(){};
 	~Position(){};
 };
