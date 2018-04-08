@@ -122,7 +122,6 @@ Etat Outils::creer_Etat(Sokoban& s) {
 	Etat e;
 	for (int i = 0; i < s.HAUTMAX; i++) {
 		for (int j = 0; j < s.LONGMAX; j++) {
-			cout << "lettre à analyser : " << s.cadre[i][j] << endl;
 			if (s.cadre[i][j] != 8 + '0'
 					&& s.cadre[i][j] != 0 + '0'
 					&& s.cadre[i][j] != 4 + '0') {
@@ -343,3 +342,10 @@ Etat Outils::generer_solution(Sokoban& s) {
 	return e;
 }
 
+void Outils::afficher_liste(std::list<Etat>& l_etats) {
+	Etat e;
+	for (std::list<Etat>::iterator it = l_etats.begin(); it != l_etats.end(); it++) {
+		e = *it;
+		cout <<"un etat : " << endl<<  e << endl;
+	}
+}

@@ -29,12 +29,11 @@ bool est_dans_la_liste(Etat& e) {
 		//cout << *state << endl;
 		if (e==*state || e.etat_sans_position_joueur() == *state
 				|| e==(*state).etat_sans_position_joueur()) {
-			cout << "return true" << endl;
+			cout << "l'Etat \n" << e << "se trouve deja dans la liste donc on ne l'ajoute pas\n";
 			return true;
 		}
 		state++;
 	}
-	cout << e << endl << "Pas dans la liste" << endl;
 	return false;
 }
 
@@ -50,14 +49,6 @@ void remplir_queue(std::list<Etat>& l_etats) {
 			etats_non_traites.push_back(*it);
 		}
 		//cout << "ajout de \n" << *it << endl;
-	}
-}
-
-void afficher_liste(std::list<Etat>& l_etats) {
-	Etat e;
-	for (std::list<Etat>::iterator it = l_etats.begin(); it != l_etats.end(); it++) {
-		e = *it;
-		cout <<"un etat : " << endl<<  e << endl;
 	}
 }
 
@@ -96,24 +87,6 @@ int main() {
 	Etat etat_courant;
 
 
-/*	cout << eSol;
-	Etat etat_main;
-	Position p;
-	p.cordX = 3; p.cordY = 1; p.valeurCase = 5;
-	etat_main.positions[0] = p;
-	p.cordX = 5; p.cordY = 3; p.valeurCase = 5;
-	etat_main.positions[1] = p;
-	p.cordX = 1; p.cordY = 4; p.valeurCase = 5;
-	etat_main.positions[2] = p;
-	p.cordX = 1; p.cordY = 5; p.valeurCase = 2;
-	etat_main.positions[3] = p;
-	etat_main.DERNIERE_POSITION = 4;
-
-	cout << "etat_main\n" << etat_main << endl;
-	if (etat_main.etat_sans_position_joueur() == eSol) {
-		cout << "true";
-	}*/
-
 	etats_non_traites.push_back(etat_depart);
 
 	int cpt = 0;
@@ -132,7 +105,8 @@ int main() {
 		}
 		sokoban_courant.appliquer_etat(etat_courant, sokoban_intial);
 		nouveaux_etats_possibles = Outils::etats_possibles(etat_courant, sokoban_courant, eSol);
-		//afficher_liste(nouveaux_etats_possibles);
+		cout << "Nouveaux etats possibles : " << endl;
+		Outils::afficher_liste(nouveaux_etats_possibles);
 		remplir_queue(nouveaux_etats_possibles);
 
 
@@ -143,19 +117,8 @@ int main() {
 	}
 
 	cout << "liste des etats : " << endl;
-//	afficher_liste(etats);
-
 	cout << "nombre de noeuds : " << etats.size() << endl;
 
-/*	Etat e = nouveaux_etats_possibles.front();
-	cout << "etat de depart : \n" << etat_depart;
-	cout << "nouvel etat possible : \n" << e;
-
-	test_egal = e == etat_depart;
-	cout << "les deux etats egaux ? " << test_egal << endl;*/
-
-
-	//afficher_liste();
 	fclose(f);
 	return 0;
 }

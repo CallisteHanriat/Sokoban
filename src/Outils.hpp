@@ -14,6 +14,7 @@ public:
 	static std::list<Etat> etats_possibles(Etat& e, Sokoban& s, Etat& eSol);
 	static Etat generer_solution(Sokoban& s);
 	static Sokoban creer_damier(FILE* f);
+	static void afficher_liste(std::list<Etat>& l_etats);
 	static bool mouvement_possible_haut(Position& p1, Position& p2, Sokoban& s);
 	static bool mouvement_possible_droit(Position& p1, Position& p2, Sokoban& s);
 	static bool mouvement_possible_bas(Position& p1, Position& p2, Sokoban& s);
