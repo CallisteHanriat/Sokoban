@@ -8,7 +8,7 @@
 
 
 /**
- *
+ * @Return true : Le mouvement en haut est possible
  */
 bool Outils::mouvement_possible_haut(Position& origine, Position& direction, Sokoban& s) {
 
@@ -24,7 +24,6 @@ bool Outils::mouvement_possible_haut(Position& origine, Position& direction, Sok
 	} else if (valeurCaseDirection == 5 && direction.cordY -1 < 0){
 		return false;
 	} else if((valeurCaseDirection == 5 || valeurCaseDirection == 1)
-			&& s.cadre[direction.cordY-1][direction.cordX]-'0' != 1
 			&& s.cadre[direction.cordY-1][direction.cordX]-'0' != 4
 			&& s.cadre[direction.cordY-1][direction.cordX]-'0' != 0
 			&& direction.cordY - 1 >= 0) {
@@ -38,7 +37,9 @@ bool Outils::mouvement_possible_haut(Position& origine, Position& direction, Sok
 	return true;
 }
 
-
+/**
+ * @Return true : Le mouvement à droite est possible
+ */
 bool Outils::mouvement_possible_droit(Position& origine, Position& direction, Sokoban& s) {
 
 	if ((direction.cordX < 0 || direction.cordY < 0)
@@ -53,7 +54,6 @@ bool Outils::mouvement_possible_droit(Position& origine, Position& direction, So
 	} else if (direction.cordX + 1 >= s.LONGMAX) {
 		return false;
 	}else if((valeurCaseDirection == 5 || valeurCaseDirection == 1)
-			&& s.cadre[direction.cordY][direction.cordX+1]-'0' != 1
 			&& s.cadre[direction.cordY][direction.cordX+1]-'0' != 4
 			&& s.cadre[direction.cordY][direction.cordX+1]-'0' != 0) {
 		return false;
@@ -66,6 +66,9 @@ bool Outils::mouvement_possible_droit(Position& origine, Position& direction, So
 	return true;
 }
 
+/**
+ * @Return true : Le mouvement en bas est possible
+ */
 bool Outils::mouvement_possible_bas(Position& origine, Position& direction, Sokoban& s) {
 	if ((direction.cordX < 0 || direction.cordY < 0)
 			|| (direction.cordY > s.HAUTMAX || direction.cordX > s.LONGMAX)) {
@@ -77,19 +80,18 @@ bool Outils::mouvement_possible_bas(Position& origine, Position& direction, Soko
 	if (valeurCaseDirection == 8) {
 		return false;
 	} else if((valeurCaseDirection == 5 || valeurCaseDirection == 1)
-			&& s.cadre[direction.cordY+1][direction.cordX]-'0' != 1
 			&& s.cadre[direction.cordY+1][direction.cordX]-'0' != 4
 			&& s.cadre[direction.cordY+1][direction.cordX]-'0' != 0) {
 		return false;
-	} else if (valeurCaseDirection == 5) {
-		return false;
-	}else if (valeurCaseDirection == 1
-			&& s.cadre[direction.cordY+1][direction.cordX]-'0' == 1) {
+	}else if ((valeurCaseDirection == 1 && s.cadre[direction.cordY+1][direction.cordX]-'0' == 1)) {
 		return false;
 	}
 	return true;
 }
 
+/**
+ * @Return true : Le mouvement à gauche est possible
+ */
 bool Outils::mouvement_possible_gauche(Position& origine, Position& direction, Sokoban& s) {
 	if ((direction.cordX < 0 || direction.cordY < 0)
 			|| (direction.cordY > s.HAUTMAX || direction.cordX > s.LONGMAX)) {
@@ -101,7 +103,6 @@ bool Outils::mouvement_possible_gauche(Position& origine, Position& direction, S
 	if (valeurCaseDirection == 8) {
 		return false;
 	} else if((valeurCaseDirection == 5 || valeurCaseDirection == 1)
-			&& s.cadre[direction.cordY][direction.cordX-1]-'0' != 1
 			&& s.cadre[direction.cordY][direction.cordX-1]-'0' != 4
 			&& s.cadre[direction.cordY][direction.cordX-1]-'0' != 0
 			&& direction.cordX -1 >= 0) {
@@ -180,9 +181,14 @@ std::list<Etat> Outils::etats_possibles(Etat& e, Sokoban& s, Etat& eSol) {
 			}
 			if (nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX == position_joueur.cordX &&
 					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY == position_joueur.cordY - 1 &&
-					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase == 1 &&
+					(nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase
+						== 1 || nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase == 5) &&
 					position_joueur.cordY > 2) {
 				if (s.cadre[position_joueur.cordY - 2][position_joueur.cordX] -'0' == 4){
+					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase = 5;
+				} else if (s.cadre[position_joueur.cordY - 2][position_joueur.cordX] -'0' == 0) {
+					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase = 1;
+				} else if (s.cadre[position_joueur.cordY - 2][position_joueur.cordX] -'0' == 4) {
 					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase = 5;
 				}
 				nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY = nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY - 1;
@@ -210,12 +216,18 @@ std::list<Etat> Outils::etats_possibles(Etat& e, Sokoban& s, Etat& eSol) {
 					== position_joueur.cordX + 1
 					&& nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY
 							== position_joueur.cordY
-					&& nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase
-							== 1 && position_joueur.cordX < s.LONGMAX-2) {
+					&& (nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase
+							== 1 || nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase == 5) && position_joueur.cordX < s.LONGMAX-2) {
 				if (s.cadre[position_joueur.cordY][position_joueur.cordX+2]
 						- '0' == 4) {
 					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase =
 							5;
+				} else if (s.cadre[position_joueur.cordY][position_joueur.cordX+2]
+															- '0' == 0) {
+					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase = 1;
+				} else if (s.cadre[position_joueur.cordY][position_joueur.cordX+2]
+															- '0' == 4) {
+					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase = 5;
 				}
 				nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX =
 						nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX + 1;
@@ -235,23 +247,33 @@ std::list<Etat> Outils::etats_possibles(Etat& e, Sokoban& s, Etat& eSol) {
 		for (int i = 0; i < e.DERNIERE_POSITION; i++) {
 			nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION] =
 					e.positions[i];
+			//si c'est le joueur, alors on fait y+1
 			if (nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase
 					== position_joueur.valeurCase) {
 				nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY =
 						nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY
 								+ 1;
 			}
+			//si on a un était sous le joueur (1 ou 5 ou 4)
 			if (nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX
 					== position_joueur.cordX
 					&& nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY
 							== position_joueur.cordY + 1
-					&& nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase
-							== 1 && position_joueur.cordY < s.HAUTMAX - 2) {
+					&& (nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase
+							== 1 || nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase == 5)
+							  && position_joueur.cordY < s.HAUTMAX - 2) {
 				if (s.cadre[position_joueur.cordY + 2][position_joueur.cordX]
 						- '0' == 4) {
 					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase =
 							5;
+				} else if (s.cadre[position_joueur.cordY + 2][position_joueur.cordX]
+						- '0' == 0){
+					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase = 1;
+				} else if (s.cadre[position_joueur.cordY + 2][position_joueur.cordX]
+						- '0' == 4) {
+					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase = 5;
 				}
+
 				nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY =
 						nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY
 								+ 1;
@@ -280,12 +302,18 @@ std::list<Etat> Outils::etats_possibles(Etat& e, Sokoban& s, Etat& eSol) {
 					== position_joueur.cordX -1
 					&& nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordY
 							== position_joueur.cordY
-					&& nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase
-							== 1 && position_joueur.cordX > 2) {
+					&& (nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase
+							== 1 || nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase == 5) && position_joueur.cordX > 2) {
 				if (s.cadre[position_joueur.cordY][position_joueur.cordX-2]
 						- '0' == 4) {
 					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase =
 							5;
+				} else if (s.cadre[position_joueur.cordY][position_joueur.cordX-2]
+															- '0' == 0) {
+					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase = 1;
+				} else if (s.cadre[position_joueur.cordY][position_joueur.cordX-2]
+															- '0' == 4) {
+					nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].valeurCase = 5;
 				}
 				nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX =
 						nouvel_etat.positions[nouvel_etat.DERNIERE_POSITION].cordX

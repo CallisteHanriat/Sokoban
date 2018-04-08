@@ -23,6 +23,10 @@ void Sokoban::test(Sokoban& s) {
 	this->cadre[0][0] = '7';
 }
 
+/**
+ * Cette fonction applique un état à un objet Sokoba (this).
+ * Le cadre de ce dernier sera modifié en conséquence.
+ */
 void Sokoban::appliquer_etat(Etat& e,  Sokoban& s_init) {
 	Sokoban s_tmp;
 	//this->affiche();
@@ -99,6 +103,8 @@ void Sokoban::appliquer_etat(Etat& e,  Sokoban& s_init) {
 				}
 				if (!bon5Trouve)
 					s_tmp.cadre[i][j] = '4';
+			} else if (vCase == '0' && s_init.cadre[i][j] == '5') {
+				s_tmp.cadre[i][j] = '4';
 			}
 		}
 	}

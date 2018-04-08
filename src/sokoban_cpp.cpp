@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include "algorithm"
 #include "Outils.hpp"
+#include <time.h>
+
 using namespace std;
 
 std::list<Etat> etats;
@@ -30,6 +32,7 @@ bool est_dans_la_liste(Etat& e) {
 		if (e==*state || e.etat_sans_position_joueur() == *state
 				|| e==(*state).etat_sans_position_joueur()) {
 			cout << "l'Etat \n" << e << "se trouve deja dans la liste donc on ne l'ajoute pas\n";
+			cout << "Etat de liste trouve : \n" << *state << endl;
 			return true;
 		}
 		state++;
@@ -61,15 +64,18 @@ void afficher_liste() {
 
 
 int main() {
+	clock_t tStart = clock();
 	FILE *f;
-	f = fopen("res/soko11.txt", "r");
+	f = fopen("res/soko1.txt", "r");
 
 	if (f == NULL) {
 		printf("File not created okay, errno = %d\n", errno);
 		return 1;
 	}
 
+	//Création du sokoban initial
 	Sokoban sokoban_intial = Outils::creer_damier(f);
+	//Création du sokoban courant qui va s'adapter selon l'évolution des états.
 	Sokoban sokoban_courant = sokoban_intial;
 	sokoban_intial.etat_initial = Outils::creer_Etat(sokoban_intial);
 	sokoban_courant.affiche();
@@ -100,7 +106,7 @@ int main() {
 		cout << "taille etats_non_traites : " << etats_non_traites.size() << endl;
 		cout << "etat coutant \n" << etat_courant << endl;
 		//on fabrique de nouveaux fils que nous mettons dans la queue
-		if (cpt == 3707) {
+		if (cpt == 8947) {
 			cout << "debug" << endl;
 		}
 		sokoban_courant.appliquer_etat(etat_courant, sokoban_intial);
@@ -120,5 +126,6 @@ int main() {
 	cout << "nombre de noeuds : " << etats.size() << endl;
 
 	fclose(f);
+	printf("Time taken: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
 	return 0;
 }
